@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:music_app/data/model/song.dart';
 import 'package:music_app/ui/discovery/discovery.dart';
 import 'package:music_app/ui/home/view-model.dart';
+import 'package:music_app/ui/now_playing/now-playing.dart';
 import 'package:music_app/ui/settings/settings.dart';
 import 'package:music_app/ui/user/user.dart';
 
@@ -146,6 +147,37 @@ class _HomeTabPageState extends State<HomeTabPage> {
       });
     });
   }
+
+  void showBottomSheet() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            child: Container(
+                height: 400,
+                color: Colors.grey,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      const Text('Modal BottomSheet'),
+                      ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("Close BottomSheet"))
+                    ],
+                  ),
+                )),
+          );
+        });
+  }
+
+  void navigate(Song song) {
+    Navigator.push(context, CupertinoPageRoute(builder: (context) {
+      return NowPlaying(songs: songs, playingSong: song);
+    }));
+  }
 }
 
 class _SongItemSection extends StatelessWidget {
@@ -165,31 +197,30 @@ class _SongItemSection extends StatelessWidget {
         right: 8,
       ),
       leading: ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: FadeInImage.assetNetwork(
-        placeholder: 'assets/itunes.png',
-        image: song.image,
-        width: 48,
-        height: 48,
-        imageErrorBuilder: (context, error, stackTrace) {
-          return Image.asset(
-            'assets/itunes.png',
+          borderRadius: BorderRadius.circular(4),
+          child: FadeInImage.assetNetwork(
+            placeholder: 'assets/itunes.png',
+            image: song.image,
             width: 48,
             height: 48,
-          );
-        },
-      )
-      ),
+            imageErrorBuilder: (context, error, stackTrace) {
+              return Image.asset(
+                'assets/itunes.png',
+                width: 48,
+                height: 48,
+              );
+            },
+          )),
       title: Text(song.title),
       subtitle: Text(song.artist),
       trailing: IconButton(
         icon: const Icon(Icons.more_horiz),
         onPressed: () {
-          // parent.onSongSelected(song);
+          parent.showBottomSheet();
         },
       ),
       onTap: () {
-        // parent.onSongSelected(song);
+        parent.navigate(song);
       },
     );
   }
